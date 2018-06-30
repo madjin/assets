@@ -1,0 +1,10 @@
+#version 120
+
+varying vec3 iNormalWorld;
+
+void main()
+{  
+    vec3 normalWorld = (iNormalWorld + vec3(1,1,1)) * 0.5;
+    gl_FragColor=vec4(normalWorld.x, normalWorld.y, normalWorld.z, 1.0);   
+
+}

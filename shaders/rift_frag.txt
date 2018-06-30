@@ -1,0 +1,46 @@
+#version 130
+
+uniform sampler2D framebuf;
+uniform vec4 HmdWarpParam;
+uniform vec4 ChromAbCorrection;
+uniform vec2 LensCenter;
+uniform vec2 Scale;
+uniform vec2 ScaleIn;
+
+varying vec2 vTex;
+
+vec2 HMDWarp(vec2 in01, float chroma_val)
+{
+    vec2 theta = (in01 - LensCenter) * ScaleIn; // Scales to [-1, 1]
+    float rSq = theta.x * theta.x + theta.y * theta.y;
+    vec2 rvector = theta * (HmdWarpParam.x + HmdWarpParam.y * rSq + HmdWarpParam.z * rSq * rSq + HmdWarpParam.w * rSq * rSq * rSq);
+    return LensCenter + Scale * rvector * chroma_val;
+}
+
+void main()
+{
+
+	float samp = 0.0005;
+
+    vec2 tc_r = HMDWarp(vTex, ChromAbCorrection.x);
+    vec2 tc_g = HMDWarp(vTex, 1.0);
+    vec2 tc_b = HMDWarp(vTex, ChromAbCorrection.z);
+
+    if ((vTex.x <= 0.5 && (tc_g.x <= 0.0 || tc_g.x >= 0.5)) ||   
+        (vTex.x >= 0.5 && (tc_g.x >= 1.0 || tc_g.x <= 0.5)) ||
+	tc_g.y < 0.0 || tc_g.y > 1.0) {
+        discard;
+    }
+
+    //gl_FragColor=vec4(texture2D(framebuf, tc_r).r, texture2D(framebuf, tc_g).g, texture2D(framebuf, tc_b).b, 1.0);
+    
+gl_FragColor=vec4(
+(texture2D(framebuf, tc_r).r + texture2D(framebuf, tc_r-vec2(samp, 0)).r + texture2D(framebuf, tc_r-vec2(0, samp)).r + texture2D(framebuf, tc_r+vec2(samp, 0)).r + texture2D(framebuf, tc_r+vec2(0, samp)).r) * 0.2,
+(texture2D(framebuf, tc_g).g + texture2D(framebuf, tc_g-vec2(samp, 0)).g + texture2D(framebuf, tc_g-vec2(0, samp)).g + texture2D(framebuf, tc_g+vec2(samp, 0)).g + texture2D(framebuf, tc_g+vec2(0, samp)).g) * 0.2, 
+(texture2D(framebuf, tc_b).b + texture2D(framebuf, tc_b-vec2(samp, 0)).b + texture2D(framebuf, tc_b-vec2(0, samp)).b + texture2D(framebuf, tc_b+vec2(samp, 0)).b + texture2D(framebuf, tc_b+vec2(0, samp)).b) * 0.2, 
+1.0
+);
+
+
+}
+

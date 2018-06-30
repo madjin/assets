@@ -1,2 +1,2 @@
 # assets
-Default assets and scripts that come packaged in with the native browsers.
+Default assets populated from older versions of JanusVR.

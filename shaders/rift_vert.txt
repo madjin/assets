@@ -1,0 +1,9 @@
+#version 130
+
+varying vec2 vTex;
+
+void main(void)
+{
+    gl_Position = ftransform();
+    vTex = vec2(gl_MultiTexCoord0);
+}      
