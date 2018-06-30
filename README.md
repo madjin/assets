@@ -1,2 +1,2 @@
 # assets
-Default assets populated from older versions of JanusVR.
+Default assets folder in Janusweb.
